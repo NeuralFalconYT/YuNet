@@ -23,7 +23,7 @@ tm = cv.TickMeter()
 while True:
     ret, frame = cap.read()
     # Flip the frame horizontally
-    frame = cv.flip(frame, 1)
+    # frame = cv.flip(frame, 1)
     if not ret:
         print("Failed to grab frame.")
         break
