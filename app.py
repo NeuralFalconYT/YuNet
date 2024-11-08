@@ -22,7 +22,7 @@ tm = cv.TickMeter()
 while True:
     ret, frame = cap.read()
     # Flip the frame horizontally
-    frame = cv.flip(frame, 1)
+    # frame = cv.flip(frame, 1)
     if not ret:
         print("Failed to grab frame.")
         break
@@ -32,7 +32,7 @@ while True:
     # faces = analyze_results(results,threshold=0.5)
     faces=analyze_results(results)
     tm.stop()
-    print(faces)
+    # print(faces)
     # Draw results on the frame
     if faces:
         frame = visualize(frame, faces,keypoints=True,display_prediction_labels=True)
