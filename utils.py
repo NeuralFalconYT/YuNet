@@ -31,34 +31,94 @@ def hex_to_bgr(hex_code):
 # print(faces)
 # [{'bbox': [176, 196, 274, 334], 'confidence': 0.9400955, 'landmarks': {'right_eye': (188, 251), 'left_eye': (226, 251), 'nose_tip': (192, 278), 'right_mouth_corner': (193, 302), 'left_mouth_corner': (227, 301)}}]
 
-def visualize(image, faces,keypoints=False,display_prediction_labels=True):
+def visualize(image, faces,bounding_box=True,keypoints=False,display_prediction_labels=True,square_blur_face=False):
     t=2
     for face in faces:
         bbox = face["bbox"]
         x1, y1, x2, y2 = bbox
         width, height = x2 - x1, y2 - y1
         # Set `l` to a percentage of the bounding box width or height
-        l = min(width, height) // 5  # 20% of the smallest dimension
+        if square_blur_face:
+            try:
+                pixel_size = 0.1
+                x1, y1, x2, y2 = bbox
 
-        color = hex_to_bgr("#00ff51")
+                # Ensure the bounding box coordinates are valid
+                if x1 >= x2 or y1 >= y2:
+                    print("Invalid bounding box coordinates:", bbox)
+                    continue  # Skip this iteration if the box is invalid
 
-        # Draw bounding box
-        cv.rectangle(image, (x1, y1), (x2, y2), color, 1)
-        # confidence = round(face["confidence"], 2)
-        # cv.putText(image, str(confidence), (x1, y1 -10), cv.FONT_HERSHEY_DUPLEX, 0.5, (0, 0, 255))
+                face_img = image[y1:y2, x1:x2].copy()
+                
+                # Calculate the desired size based on the bounding box
+                desired_width = x2 - x1
+                desired_height = y2 - y1
+                
+                # Calculate the small size for resizing
+                small_width = int(desired_width * pixel_size)
+                small_height = int(desired_height * pixel_size)
 
-        # Draw top-left corner
-        cv.line(image, (x1, y1), (x1 + l, y1), color, thickness=t)
-        cv.line(image, (x1, y1), (x1, y1 + l), color, thickness=t)
-        # Draw top-right corner
-        cv.line(image, (x2, y1), (x2 - l, y1), color, thickness=t)
-        cv.line(image, (x2, y1), (x2, y1 + l), color, thickness=t)
-        # Draw bottom-left corner
-        cv.line(image, (x1, y2), (x1 + l, y2), color, thickness=t)
-        cv.line(image, (x1, y2), (x1, y2 - l), color, thickness=t)
-        # Draw bottom-right corner
-        cv.line(image, (x2, y2), (x2 - l, y2), color, thickness=t)
-        cv.line(image, (x2, y2), (x2, y2 - l), color, thickness=t)
+                # Ensure the small size is at least 1x1
+                small_width = max(1, small_width)
+                small_height = max(1, small_height)
+
+                # Resize the face image to a smaller size
+                face_img = cv.resize(
+                    face_img,
+                    dsize=(small_width, small_height),
+                    interpolation=cv.INTER_NEAREST,
+                )
+                
+                # Resize back to the original size of the bounding box
+                face_img_resized = cv.resize(
+                    face_img,
+                    dsize=(desired_width, desired_height),
+                    interpolation=cv.INTER_NEAREST,
+                )
+                
+                # Ensure the face image fits exactly in the bounding box
+                if face_img_resized.shape[0] != (y2 - y1) or face_img_resized.shape[1] != (x2 - x1):
+                    # Create a blank image with the bounding box size
+                    blank_face_img = np.zeros((desired_height, desired_width, 3), dtype=np.uint8)
+
+                    # Get the actual width and height of the resized face image
+                    actual_height, actual_width = face_img_resized.shape[:2]
+
+                    # Calculate the cropping region if resized image is larger
+                    if actual_height > desired_height or actual_width > desired_width:
+                        face_img_resized = cv.resize(face_img_resized, (desired_width, desired_height), interpolation=cv2.INTER_LINEAR)
+
+                    # Place the resized image into the blank image
+                    blank_face_img[:actual_height, :actual_width] = face_img_resized
+
+                    # Update face_img_resized to the blank face image
+                    face_img_resized = blank_face_img
+
+                # Assign the resized face image to the original image
+                image[y1:y2, x1:x2] = face_img_resized
+            except Exception as e:
+                pass
+        if bounding_box:
+            l = min(width, height) // 5  # 20% of the smallest dimension
+            color = hex_to_bgr("#00ff51")
+
+            # Draw bounding box
+            cv.rectangle(image, (x1, y1), (x2, y2), color, 1)
+            # confidence = round(face["confidence"], 2)
+            # cv.putText(image, str(confidence), (x1, y1 -10), cv.FONT_HERSHEY_DUPLEX, 0.5, (0, 0, 255))
+
+            # Draw top-left corner
+            cv.line(image, (x1, y1), (x1 + l, y1), color, thickness=t)
+            cv.line(image, (x1, y1), (x1, y1 + l), color, thickness=t)
+            # Draw top-right corner
+            cv.line(image, (x2, y1), (x2 - l, y1), color, thickness=t)
+            cv.line(image, (x2, y1), (x2, y1 + l), color, thickness=t)
+            # Draw bottom-left corner
+            cv.line(image, (x1, y2), (x1 + l, y2), color, thickness=t)
+            cv.line(image, (x1, y2), (x1, y2 - l), color, thickness=t)
+            # Draw bottom-right corner
+            cv.line(image, (x2, y2), (x2 - l, y2), color, thickness=t)
+            cv.line(image, (x2, y2), (x2, y2 - l), color, thickness=t)
         if keypoints:
             # Draw landmarks with distinct colors
             landmarks = face["landmarks"]
