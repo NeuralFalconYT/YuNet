@@ -9,6 +9,7 @@ model = load_model(conf_threshold=0.7, nms_threshold=0.7)
 
 # Open the camera
 cap = cv.VideoCapture(deviceId)
+
 if not cap.isOpened():
     print("Error: Could not open camera.")
     exit()
@@ -22,7 +23,8 @@ tm = cv.TickMeter()
 while True:
     ret, frame = cap.read()
     # Flip the frame horizontally
-    # frame = cv.flip(frame, 1)
+    frame = cv.flip(frame, 1)
+    height, width = frame.shape[:2]
     if not ret:
         print("Failed to grab frame.")
         break
@@ -37,7 +39,9 @@ while True:
     if faces:
         frame = visualize(frame, faces,keypoints=True,display_prediction_labels=True)
     # display the fps at top left corner
-    cv.putText(frame, "FPS: {:.2f}".format(tm.getFPS()), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+    cv.putText(frame, "FPS: {:.2f}".format(tm.getFPS()), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+    # if height > 720:
+    #     frame = cv.resize(frame, (1280, 720))
     cv.imshow('Camera Feed', frame)
     tm.reset()
     # Exit when the user presses the Esc key
