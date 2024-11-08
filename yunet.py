@@ -67,7 +67,7 @@ def load_model(conf_threshold=0.9,nms_threshold=0.3):
     [cv.dnn.DNN_BACKEND_TIMVX,  cv.dnn.DNN_TARGET_NPU],
     [cv.dnn.DNN_BACKEND_CANN,   cv.dnn.DNN_TARGET_NPU]
     ]
-    backend_index = 2
+    backend_index = 0
     backend_id = backend_target_pairs[backend_index][0]
     target_id = backend_target_pairs[backend_index][1]
     print('Backend: {}, Target: {}'.format(backend_id, target_id))
