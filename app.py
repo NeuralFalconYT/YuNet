@@ -3,7 +3,7 @@ from yunet import load_model
 from utils import analyze_results,visualize
 # Load the model
 deviceId = 0
-# deviceId = "video.mp4"
+deviceId = "video.mp4"
 model = load_model(conf_threshold=0.7, nms_threshold=0.7)
 
 
@@ -24,10 +24,10 @@ while True:
     ret, frame = cap.read()
     # Flip the frame horizontally
     frame = cv.flip(frame, 1)
-    height, width = frame.shape[:2]
     if not ret:
         print("Failed to grab frame.")
         break
+    height, width = frame.shape[:2]
     # Inference
     tm.start()
     results = model.infer(frame)
