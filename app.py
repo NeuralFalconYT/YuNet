@@ -2,8 +2,8 @@ import cv2 as cv
 from yunet import load_model
 from utils import analyze_results,visualize
 # Load the model
-# deviceId = 0
-deviceId = "video.mp4"
+deviceId = 0
+# deviceId = "video.mp4"
 model = load_model(conf_threshold=0.7, nms_threshold=0.7)
 
 
