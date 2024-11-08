@@ -37,7 +37,7 @@ while True:
     # print(faces)
     # Draw results on the frame
     if faces:
-        frame = visualize(frame, faces,bounding_box=True,keypoints=False,display_prediction_labels=True,square_blur_face=True)
+        frame = visualize(frame, faces,bounding_box=True,keypoints=True,display_prediction_labels=True,square_blur_face=False)
     # display the fps at top left corner
     cv.putText(frame, "FPS: {:.2f}".format(tm.getFPS()), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
     # if height > 720:
